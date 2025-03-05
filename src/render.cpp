@@ -3,6 +3,7 @@
 #include "material.h"
 #include "parallel.h"
 #include "path_tracing.h"
+#include "restir_tracing.h"
 #include "vol_path_tracing.h"
 #include "pcg.h"
 #include "progress_reporter.h"
@@ -151,6 +152,93 @@ Image3 vol_path_render(const Scene &scene) {
     return img;
 }
 
+Image3 restir_render(const Scene &scene) {
+    int w = scene.camera.width, h = scene.camera.height;
+    Image3 img(w, h);
+
+    for (int i = 0; i<scene.lights.size(); i++){
+        if (std::holds_alternative<DiffuseAreaLight>(scene.lights[i])){
+            std::cout<<std::get<DiffuseAreaLight>(scene.lights[i]).intensity<<std::endl;
+        }
+    }
+
+    constexpr int tile_size = 16;
+    int num_tiles_x = (w + tile_size - 1) / tile_size;
+    int num_tiles_y = (h + tile_size - 1) / tile_size;
+
+    int spp = scene.options.samples_per_pixel;
+    // For each pixel, sample spp light paths
+    ProgressReporter reporter(spp);
+    for (int _ = 0; _ < spp; _++){
+        ReservoirBuffer G_buffer(w, h);
+
+        // Init G_buffer and check visibility
+        parallel_for([&](const Vector2i &tile){
+            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]);
+            int x0 = tile[0] * tile_size;
+            int x1 = min(x0 + tile_size, w);
+            int y0 = tile[1] * tile_size;
+            int y1 = min(y0 + tile_size, h);
+            for (int y = y0; y < y1; y++) {
+                for (int x = x0; x < x1; x++) {
+                    init_reservoir(scene, G_buffer, x, y, rng);
+                }
+            }
+        }, Vector2i(num_tiles_x, num_tiles_y));
+
+        // Since we do not render animation
+        // only use spatial information to update reservoir for each pixel
+        int k = scene.options.neighbors_per_pixel;
+
+        // Just random seed for rng
+        pcg32_state rng = init_pcg32(2357);
+        for (int __=0; __<k; __++){
+            for (int y=0; y<h; y++){
+                for (int x=0; x<w; x++){
+                    spatial_reuse(scene, G_buffer, x, y, rng);
+                }
+            }
+        }
+
+        // compute radiance for each pixel
+        parallel_for([&](const Vector2i &tile){
+            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]);
+            int x0 = tile[0] * tile_size;
+            int x1 = min(x0 + tile_size, w);
+            int y0 = tile[1] * tile_size;
+            int y1 = min(y0 + tile_size, h);
+            for (int y = y0; y < y1; y++) {
+                for (int x = x0; x < x1; x++) {
+                    Spectrum L = compute_radiance(scene, G_buffer, x, y, rng);
+                    // if (L.x != 0.0 || L.y != 0.0 || L.z != 0){
+                    //     std::cout<<"OK there are some color here"<<std::endl;
+                    //     std::cout<<L<<std::endl;
+                    // }
+                    img(x, y) += L;
+                }
+            }
+        }, Vector2i(num_tiles_x, num_tiles_y));
+        reporter.update(1);
+    }
+    reporter.done();
+
+    // Post-processing, divide the radiance of each pixel by spp
+    ProgressReporter reporter2(num_tiles_x * num_tiles_y);
+    parallel_for([&](const Vector2i &tile){
+        int x0 = tile[0] * tile_size;
+        int x1 = min(x0 + tile_size, w);
+        int y0 = tile[1] * tile_size;
+        int y1 = min(y0 + tile_size, h);
+        for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; x++) {
+                img(x, y) = img(x, y) / Real(spp);
+            }
+        }
+        reporter2.update(1);
+    }, Vector2i(num_tiles_x, num_tiles_y));
+    reporter2.done();
+    return img;
+}
 
 Image3 render(const Scene &scene) {
     if (scene.options.integrator == Integrator::Depth ||
@@ -163,6 +251,8 @@ Image3 render(const Scene &scene) {
         return path_render(scene);
     } else if (scene.options.integrator == Integrator::VolPath) {
         return vol_path_render(scene);
+    } else if (scene.options.integrator == Integrator::ReSTIR) {
+        return restir_render(scene);
     } else {
         assert(false);
         return Image3();

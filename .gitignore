@@ -45,3 +45,6 @@ build/
 
 #vscode related
 .vscode
+
+# clangd cace
+.cache/

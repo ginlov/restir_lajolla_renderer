@@ -570,6 +570,21 @@ RenderOptions parse_integrator(pugi::xml_node node,
                     child.attribute("value").value(), default_map);
             }
         }
+    } else if (type == "restir") {
+        options.integrator = Integrator::ReSTIR;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "neighbors_per_pixel" || name == "neighborsPerPixel"){
+                options.neighbors_per_pixel = parse_integer(
+                    child.attribute("value").value(), default_map);
+            } else if (name == "reservoir_size" || name == "reservoirSize"){
+                options.reservoir_size = parse_integer(
+                    child.attribute("value").value(), default_map);
+            } else if (name == "max_radius" || name == "maxRadius") {
+                options.max_radius = parse_integer(
+                    child.attribute("value").value(), default_map);
+            }
+        }
     } else if (type == "direct") {
         options.integrator = Integrator::Path;
         options.max_depth = 2;
