@@ -48,3 +48,6 @@ build/
 
 # clangd cace
 .cache/
+
+# MacOS cache
+.DS_Store
