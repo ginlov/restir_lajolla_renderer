@@ -156,12 +156,6 @@ Image3 restir_render(const Scene &scene) {
     int w = scene.camera.width, h = scene.camera.height;
     Image3 img(w, h);
 
-    for (int i = 0; i<scene.lights.size(); i++){
-        if (std::holds_alternative<DiffuseAreaLight>(scene.lights[i])){
-            std::cout<<std::get<DiffuseAreaLight>(scene.lights[i]).intensity<<std::endl;
-        }
-    }
-
     constexpr int tile_size = 16;
     int num_tiles_x = (w + tile_size - 1) / tile_size;
     int num_tiles_y = (h + tile_size - 1) / tile_size;
@@ -210,10 +204,6 @@ Image3 restir_render(const Scene &scene) {
             for (int y = y0; y < y1; y++) {
                 for (int x = x0; x < x1; x++) {
                     Spectrum L = compute_radiance(scene, G_buffer, x, y, rng);
-                    // if (L.x != 0.0 || L.y != 0.0 || L.z != 0){
-                    //     std::cout<<"OK there are some color here"<<std::endl;
-                    //     std::cout<<L<<std::endl;
-                    // }
                     img(x, y) += L;
                 }
             }
@@ -223,7 +213,6 @@ Image3 restir_render(const Scene &scene) {
     reporter.done();
 
     // Post-processing, divide the radiance of each pixel by spp
-    ProgressReporter reporter2(num_tiles_x * num_tiles_y);
     parallel_for([&](const Vector2i &tile){
         int x0 = tile[0] * tile_size;
         int x1 = min(x0 + tile_size, w);
@@ -234,9 +223,7 @@ Image3 restir_render(const Scene &scene) {
                 img(x, y) = img(x, y) / Real(spp);
             }
         }
-        reporter2.update(1);
     }, Vector2i(num_tiles_x, num_tiles_y));
-    reporter2.done();
     return img;
 }
 

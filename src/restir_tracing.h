@@ -11,8 +11,8 @@ struct ReservoirSample {
     Real p_hat;
     Real w;
 
-    ReservoirSample(): light_id(-1), x(PointAndNormal()), w(0), p_hat(0) {};
-    ReservoirSample(int light_id, PointAndNormal x, Real w, Real p_hat) : light_id(light_id), x(x), w(w), p_hat(p_hat) {}
+    ReservoirSample(): light_id(-1), x(PointAndNormal()), p_hat(0), w(0) {};
+    ReservoirSample(int light_id, PointAndNormal x, Real p_hat, Real w) : light_id(light_id), x(x), p_hat(p_hat),  w(w) {}
 };
 
 struct Reservoir {
@@ -27,13 +27,16 @@ struct Reservoir {
 
     // TODO: If neighbor sample is on another object, reject it
     void update(const ReservoirSample& candidate, pcg32_state& rng){
+        if (candidate.light_id == -1){
+            return;
+        }
+
         w_sum += candidate.w;
         M += 1;
         Real random_cdf = next_pcg32_real<Real>(rng);
-        
-        if (M == 1 || (random_cdf < candidate.w && candidate.light_id != -1)){
+        if (M == 1 || random_cdf < candidate.w / w_sum){
             y = candidate;
-            W = W * (candidate.p_hat / M);
+            W = w_sum / (M * y.p_hat);
         }
     }
 };
@@ -80,6 +83,11 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
         // Calculate p
         Real p = light_pmf(scene, light_id) * pdf_point_on_light(light, x, q.position, scene);
         
+        // Numerical error
+        if (light_id == -1 || p <= 0){
+            continue;
+        }
+        
         // Calculate p_hat
         Spectrum Le = emission(light, -dir_to_light, Real(1), x, scene);
         Spectrum rho = eval(scene.materials[q.material_id], -ray.dir, dir_to_light, q, scene.texture_pool);
@@ -88,7 +96,7 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
 
         // Update reservoir
         Real w_x = p_hat / p;
-        r.update(ReservoirSample(light_id, x, w_x, p_hat), rng);
+        r.update(ReservoirSample(light_id, x, p_hat, w_x), rng);
     }
 };
 
@@ -105,7 +113,7 @@ void init_reservoir(const Scene &scene, ReservoirBuffer &G_buffer, int x, int y,
     
     // Check whether the ray hits the any objects
     if (!vertex_){
-        // Do something here, deal with environment map for example
+        // Do nothing here, deal with environment map in compute radiance function
         return;
     }
     
@@ -134,8 +142,8 @@ void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, int x, int y, 
     // Sample a neighbor
     Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
     Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
-    int x_ = x + radius * cos(theta);
-    int y_ = y + radius * sin(theta);
+    int x_ = x + std::round(radius * cos(theta));
+    int y_ = y + std::round(radius * sin(theta));
     x_ = max(0, min(x_, scene.camera.width - 1));
     y_ = max(0, min(y_, scene.camera.height - 1));
     Reservoir neighbor_reservoir = G_buffer(x_, y_);
@@ -162,17 +170,32 @@ Spectrum compute_radiance(const Scene &scene, ReservoirBuffer& G_buffer, int x, 
     Spectrum radiance = make_zero_spectrum();
 
     Reservoir& r = G_buffer(x, y);
-    if (!r.org_vertex){
+
+     // If there is no hit point, account for environment map
+     if (!r.org_vertex){
+        int w = scene.camera.width, h = scene.camera.height;
+        Vector2 screen_pos((x + next_pcg32_real<Real>(rng)) / w,
+                        (y + next_pcg32_real<Real>(rng)) / h);
+        Ray ray = sample_primary(scene.camera, screen_pos);
+        RayDifferential ray_diff = init_ray_differential(w, h);
+        if (has_envmap(scene)) {
+            const Light &envmap = get_envmap(scene);
+            return emission(envmap,
+                            -ray.dir, // pointing outwards from light
+                            ray_diff.spread,
+                            PointAndNormal{}, // dummy parameter for envmap
+                            scene);
+        }
         return radiance;
     }
 
     Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
     PathVertex org_vertex = *r.org_vertex;
-    Vector3 input_dir = normalize(cam_org - org_vertex.position);
+    Vector3 in_dir = normalize(cam_org - org_vertex.position);
 
     // If point is light, account for the emission
     if (is_light(scene.shapes[org_vertex.shape_id])){
-        radiance += emission(org_vertex, -input_dir, scene);
+        radiance += emission(org_vertex, in_dir, scene);
     }
     // If invalid light sampled from RIS, return radiance
     if (r.y.light_id == -1){
@@ -182,16 +205,13 @@ Spectrum compute_radiance(const Scene &scene, ReservoirBuffer& G_buffer, int x, 
     Light light = scene.lights[r.y.light_id];
     PointAndNormal point_on_light = r.y.x;
     Vector3 dir_light = normalize(point_on_light.position - org_vertex.position);
-    Spectrum Le = emission(light, -dir_light, Real(1), point_on_light, scene);
-    Spectrum rho = eval(scene.materials[org_vertex.material_id], input_dir, dir_light, org_vertex, scene.texture_pool);
-    // Real G = fabs(dot(-dir_light, point_on_light.normal)) / distance_squared(point_on_light.position, org_vertex.position);
-    // Real p1 = r.y.p_hat / r.y.w;
-    Real p2 = pdf_sample_bsdf(scene.materials[org_vertex.material_id], input_dir, dir_light, org_vertex, scene.texture_pool);
-
-    // If sampled light pdf is less than or equal to 0, return radiance
-    if (p2 <= 0){
+    Spectrum Le = emission(light, -dir_light, Real(0), point_on_light, scene);
+    Spectrum rho = eval(scene.materials[org_vertex.material_id], in_dir, dir_light, org_vertex, scene.texture_pool);
+    Real G = fabs(dot(-dir_light, point_on_light.normal)) / distance_squared(point_on_light.position, org_vertex.position);
+    Real W = r.W;
+    if (W == 0){
         return radiance;
     }
-    radiance += rho * Le / p2;
+    radiance += rho * Le * G * W;
     return radiance;
 }

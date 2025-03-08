@@ -1,0 +1,524 @@
+<scene version="2.1.0">
+
+
+
+	<default name="spp" value="1" />
+	<default name="resx" value="1920" />
+	<default name="resy" value="1080" />
+
+
+
+	<integrator type="restir" id="elm__0" name="elm__0">
+	<!-- <integrator type="path" id="elm__0" name="elm__0"> -->
+		<integer name="max_depth" value="2"/>
+		<integer name="neighbors_per_pixel" value="3"/>
+		<integer name="reservoir_size" value="16"/>
+	</integrator>
+	<sensor type="perspective" id="elm__67" name="elm__67">
+		<string name="fov_axis" value="x" />
+		<float name="fov" value="39.597755" />
+		<float name="principal_point_offset_x" value="0.000000" />
+		<float name="principal_point_offset_y" value="-0.000000" />
+		<float name="near_clip" value="0.100000" />
+		<float name="far_clip" value="100.000000" />
+		<transform name="to_world">
+			<rotate x="1" angle="-153.5592908827048" />
+			<rotate y="1" angle="-46.691938147394204" />
+			<rotate z="1" angle="-179.999991348578" />
+			<translate value="9.147465 7.640733 9.562916" />
+		</transform>
+		<sampler type="independent" name="sampler">
+			<integer name="sample_count" value="$spp" />
+		</sampler>
+		<film type="hdrfilm" name="film">
+			<integer name="width" value="$resx" />
+			<integer name="height" value="$resy" />
+		</film>
+	</sensor>
+
+
+
+	<bsdf type="twosided" id="mat-Chromat" name="mat-Chromat">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.800000 0.800000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="1.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.008020" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.594488" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-rubber 01" name="mat-rubber 01">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.000000 0.000000 0.000000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Color" name="mat-Color">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.043735 0.045186 0.090842" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="1.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.250000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Color 2" name="mat-Color 2">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.043735 0.045186 0.090842" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="1.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="1.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-rubber" name="mat-rubber">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.000000 0.000000 0.000000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="diffuse" id="mat-Glass" name="mat-Glass">
+		<rgb value="1.000000 0.000000 0.300000" name="reflectance" />
+	</bsdf>
+	<bsdf type="twosided" id="mat-light" name="mat-light">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.800000 0.800000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-seats" name="mat-seats">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.598780 0.449266" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-white plate" name="mat-white plate">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.800000 0.800000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-cromat.003" name="mat-cromat.003">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.800000 0.800000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="1.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.000000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.594488" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="diffuse" id="mat-glass lights" name="mat-glass lights">
+		<rgb value="1.000000 0.000000 0.300000" name="reflectance" />
+	</bsdf>
+	<bsdf type="twosided" id="mat-cromat 04" name="mat-cromat 04">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.800000 0.800000 0.800000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="1.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.000000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.594488" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="principled" id="mat-red glass 2" name="mat-red glass 2">
+		<rgb value="0.800000 0.176512 0.075932" name="base_color" />
+		<float name="spec_trans" value="0.976378" />
+		<float name="metallic" value="0.000000" />
+		<float name="anisotropic" value="0.000000" />
+		<float name="roughness" value="0.000000" />
+		<float name="sheen" value="0.000000" />
+		<float name="clearcoat" value="0.000000" />
+		<float name="clearcoat_gloss" value="0.000900" />
+		<float name="eta" value="1.450000" />
+	<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	<bsdf type="twosided" id="mat-rubber 002" name="mat-rubber 002">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.000000 0.000000 0.000000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-black" name="mat-black">
+		<bsdf type="principled" name="bsdf">
+			<rgb value="0.000000 0.000000 0.000000" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	</bsdf>
+	<bsdf type="principled" id="mat-red glass 1" name="mat-red glass 1">
+		<rgb value="0.800000 0.015742 0.023664" name="base_color" />
+		<float name="spec_trans" value="0.976378" />
+		<float name="metallic" value="0.000000" />
+		<float name="anisotropic" value="0.000000" />
+		<float name="roughness" value="0.000000" />
+		<float name="sheen" value="0.000000" />
+		<float name="clearcoat" value="0.000000" />
+		<float name="clearcoat_gloss" value="0.000900" />
+		<float name="eta" value="1.450000" />
+	<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /></bsdf>
+	<bsdf type="diffuse" id="empty-emitter-bsdf" name="empty-emitter-bsdf">
+		<rgb value="0.000000" name="reflectance" />
+	</bsdf>
+
+
+
+	<shape type="ply" id="elm__69" name="elm__69">
+		<string name="filename" value="meshes/Sphere.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 3.594953 5.754402" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__70" name="elm__70">
+		<string name="filename" value="meshes/Sphere_001.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.925525 1.050914 19.000000" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__71" name="elm__71">
+		<string name="filename" value="meshes/Sphere_002.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 3.594953 5.754402" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__72" name="elm__72">
+		<string name="filename" value="meshes/Sphere_003.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 3.594953 5.754402" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__73" name="elm__73">
+		<string name="filename" value="meshes/Sphere_004.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="100.000000 90.408581 85.187358" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__74" name="elm__74">
+		<string name="filename" value="meshes/Sphere_005.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.000000 10.000000 0.225261" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__75" name="elm__75">
+		<string name="filename" value="meshes/Sphere_006.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.000000 10.000000 6.387514" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__76" name="elm__76">
+		<string name="filename" value="meshes/Sphere_007.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 3.594953 5.754402" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__77" name="elm__77">
+		<string name="filename" value="meshes/Sphere_008.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.000000 0.015234" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__78" name="elm__78">
+		<string name="filename" value="meshes/Sphere_009.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="7.463793 10.000000 0.000000" name="radiance" />
+		</emitter>
+	</shape>
+
+
+
+	<shape type="ply" id="elm__4" name="elm__4">
+		<string name="filename" value="meshes/wheel_1_001-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__5" name="elm__5">
+		<string name="filename" value="meshes/wheel_1_001-rubber 01.ply" />
+		<ref id="mat-rubber 01" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__6" name="elm__6">
+		<string name="filename" value="meshes/wheel_1_001-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__11" name="elm__11">
+		<string name="filename" value="meshes/chasis-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__12" name="elm__12">
+		<string name="filename" value="meshes/chasis-Color 2.ply" />
+		<ref id="mat-Color 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__13" name="elm__13">
+		<string name="filename" value="meshes/chasis-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__14" name="elm__14">
+		<string name="filename" value="meshes/chasis-rubber.ply" />
+		<ref id="mat-rubber" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__15" name="elm__15">
+		<string name="filename" value="meshes/chasis-Glass.ply" />
+		<ref id="mat-Glass" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__16" name="elm__16">
+		<string name="filename" value="meshes/chasis-light.ply" />
+		<ref id="mat-light" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__17" name="elm__17">
+		<string name="filename" value="meshes/wheel_1-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__18" name="elm__18">
+		<string name="filename" value="meshes/wheel_1-rubber 01.ply" />
+		<ref id="mat-rubber 01" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__19" name="elm__19">
+		<string name="filename" value="meshes/wheel_1-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__20" name="elm__20">
+		<string name="filename" value="meshes/stering_wheel.ply" />
+		<ref id="mat-rubber 01" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__22" name="elm__22">
+		<string name="filename" value="meshes/seat_Back.ply" />
+		<ref id="mat-seats" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__23" name="elm__23">
+		<string name="filename" value="meshes/seat.ply" />
+		<ref id="mat-seats" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__24" name="elm__24">
+		<string name="filename" value="meshes/radiadotr.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__26" name="elm__26">
+		<string name="filename" value="meshes/plate_back.ply" />
+		<ref id="mat-white plate" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__27" name="elm__27">
+		<string name="filename" value="meshes/Plate.ply" />
+		<ref id="mat-white plate" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__28" name="elm__28">
+		<string name="filename" value="meshes/motor.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__29" name="elm__29">
+		<string name="filename" value="meshes/mirror.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__31" name="elm__31">
+		<string name="filename" value="meshes/Logo.ply" />
+		<ref id="mat-cromat.003" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__32" name="elm__32">
+		<string name="filename" value="meshes/interior-rubber.ply" />
+		<ref id="mat-rubber" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__33" name="elm__33">
+		<string name="filename" value="meshes/interior-Glass.ply" />
+		<ref id="mat-Glass" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__34" name="elm__34">
+		<string name="filename" value="meshes/handle_001.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__35" name="elm__35">
+		<string name="filename" value="meshes/handle__back-door.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__36" name="elm__36">
+		<string name="filename" value="meshes/handle.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__38" name="elm__38">
+		<string name="filename" value="meshes/glass_light.ply" />
+		<ref id="mat-glass lights" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__40" name="elm__40">
+		<string name="filename" value="meshes/front_door-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__41" name="elm__41">
+		<string name="filename" value="meshes/front_door-Color 2.ply" />
+		<ref id="mat-Color 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__42" name="elm__42">
+		<string name="filename" value="meshes/front_door-cromat 04.ply" />
+		<ref id="mat-cromat 04" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__43" name="elm__43">
+		<string name="filename" value="meshes/front_door-Glass.ply" />
+		<ref id="mat-Glass" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__45" name="elm__45">
+		<string name="filename" value="meshes/f__bumper-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__46" name="elm__46">
+		<string name="filename" value="meshes/f__bumper-rubber 01.ply" />
+		<ref id="mat-rubber 01" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__47" name="elm__47">
+		<string name="filename" value="meshes/f__bumper-red glass 2.ply" />
+		<ref id="mat-red glass 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__48" name="elm__48">
+		<string name="filename" value="meshes/ext_light.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__50" name="elm__50">
+		<string name="filename" value="meshes/escape-cromat 04.ply" />
+		<ref id="mat-cromat 04" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__51" name="elm__51">
+		<string name="filename" value="meshes/escape-rubber 002.ply" />
+		<ref id="mat-rubber 002" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__52" name="elm__52">
+		<string name="filename" value="meshes/door_001-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__53" name="elm__53">
+		<string name="filename" value="meshes/door_001-Color 2.ply" />
+		<ref id="mat-Color 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__54" name="elm__54">
+		<string name="filename" value="meshes/door_001-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__55" name="elm__55">
+		<string name="filename" value="meshes/door_001-Glass.ply" />
+		<ref id="mat-Glass" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__56" name="elm__56">
+		<string name="filename" value="meshes/bumper-cromat 04.ply" />
+		<ref id="mat-cromat 04" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__57" name="elm__57">
+		<string name="filename" value="meshes/bumper-rubber 002.ply" />
+		<ref id="mat-rubber 002" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__59" name="elm__59">
+		<string name="filename" value="meshes/bottom_car.ply" />
+		<ref id="mat-black" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__61" name="elm__61">
+		<string name="filename" value="meshes/backlihght-red glass 1.ply" />
+		<ref id="mat-red glass 1" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__62" name="elm__62">
+		<string name="filename" value="meshes/backlihght-red glass 2.ply" />
+		<ref id="mat-red glass 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__63" name="elm__63">
+		<string name="filename" value="meshes/back_door-Color.ply" />
+		<ref id="mat-Color" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__64" name="elm__64">
+		<string name="filename" value="meshes/back_door-Color 2.ply" />
+		<ref id="mat-Color 2" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__65" name="elm__65">
+		<string name="filename" value="meshes/back_door-Chromat.ply" />
+		<ref id="mat-Chromat" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__66" name="elm__66">
+		<string name="filename" value="meshes/back_door-Glass.ply" />
+		<ref id="mat-Glass" name="bsdf" />
+	</shape>
+
+<emitter type="envmap" id="Area_002-light">
+		<string name="filename" value="../matpreview/envmap.exr"/>
+		<transform name="toWorld">
+			<rotate y="1" angle="-180"/>
+			<matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>
+		</transform>
+		<float name="scale" value="3"/>
+</emitter>
+
+</scene>
