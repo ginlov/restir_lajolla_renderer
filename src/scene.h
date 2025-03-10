@@ -30,6 +30,7 @@ struct RenderOptions {
     int vol_path_version = 0;
     int max_null_collisions = 1000;
     int neighbors_per_pixel = 3;
+    int num_neighbors_per_update = 5;
     int reservoir_size = 32;
     int max_radius = 30;
 };

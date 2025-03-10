@@ -2,7 +2,7 @@
 
 <!-- Defaults, these can be set via the command line: -Darg=value -->
 
-	<default name="spp" value="1"/>
+	<default name="spp" value="2"/>
 	<!-- <default name="resx" value="505"/> -->
 	<!-- <default name="resy" value="283"/> -->
 	<default name="resx" value="1800"/>
@@ -15,6 +15,7 @@
 	<!-- <integrator type="manylight"></integrator> -->
 	<integrator type="restir" id="elm__0" name="elm__0">
 		<integer name="neighbors_per_pixel" value="1"/>
+        <integer name="num_neighbors_per_update" value="5"/>
 		<integer name="reservoir_size" value="32"/>
 	</integrator>
 	

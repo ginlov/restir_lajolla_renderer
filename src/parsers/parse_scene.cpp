@@ -577,6 +577,9 @@ RenderOptions parse_integrator(pugi::xml_node node,
             if (name == "neighbors_per_pixel" || name == "neighborsPerPixel"){
                 options.neighbors_per_pixel = parse_integer(
                     child.attribute("value").value(), default_map);
+            } else if (name == "num_neighbors_per_update" || name == "numNeighborsPerUpdate"){
+                options.num_neighbors_per_update = parse_integer(
+                    child.attribute("value").value(), default_map);
             } else if (name == "reservoir_size" || name == "reservoirSize"){
                 options.reservoir_size = parse_integer(
                     child.attribute("value").value(), default_map);

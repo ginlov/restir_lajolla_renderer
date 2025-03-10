@@ -30,11 +30,10 @@ struct Reservoir {
         if (candidate.light_id == -1){
             return;
         }
-
         w_sum += candidate.w;
         M += 1;
         Real random_cdf = next_pcg32_real<Real>(rng);
-        if (M == 1 || random_cdf < candidate.w / w_sum){
+        if (random_cdf < candidate.w / w_sum){
             y = candidate;
             W = w_sum / (M * y.p_hat);
         }
@@ -44,8 +43,7 @@ struct Reservoir {
 struct ReservoirBuffer {
     ReservoirBuffer() {};
     ReservoirBuffer(int width, int height): width(width), height(height) {
-        data.resize(width * height);
-        memset(data.data(), 0, sizeof(Reservoir) * data.size());
+        data.resize(width * height, Reservoir());
     }
 
     Reservoir &operator()(int x, int y) {
@@ -74,6 +72,12 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
     // Sample M light paths candidates
     for (int i=1; i<M+1; i++){
         int light_id = sample_light(scene, next_pcg32_real<Real>(rng));
+
+        // Invalid light_id
+        if (light_id == -1){
+            continue;
+        }
+
         Light light = scene.lights[light_id];
         Vector2 rng_uv_params(next_pcg32_real<Real>(rng), next_pcg32_real<Real>(rng));
         Real rng_w_param = next_pcg32_real<Real>(rng);
@@ -84,14 +88,21 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
         Real p = light_pmf(scene, light_id) * pdf_point_on_light(light, x, q.position, scene);
         
         // Numerical error
-        if (light_id == -1 || p <= 0){
+        if ( p <= 0){
             continue;
         }
         
         // Calculate p_hat
-        Spectrum Le = emission(light, -dir_to_light, Real(1), x, scene);
+        Spectrum Le = emission(light, -dir_to_light, Real(0), x, scene);
         Spectrum rho = eval(scene.materials[q.material_id], -ray.dir, dir_to_light, q, scene.texture_pool);
-        Real G = fabs(dot(dir_to_light, x.normal)) / distance_squared(x.position, q.position);
+
+        // Check visibility
+        Ray shadow_ray{q.position, normalize(x.position - q.position), get_shadow_epsilon(scene), 
+            (1-get_shadow_epsilon(scene)) * distance(x.position, q.position)};
+        Real G = 0;
+        if (!occluded(scene, shadow_ray)){
+            G = max(-dot(dir_to_light, x.normal), Real(0)) / distance_squared(x.position, q.position);
+        }
         Real p_hat = luminance(Le * rho) * G;
 
         // Update reservoir
@@ -130,39 +141,49 @@ void init_reservoir(const Scene &scene, ReservoirBuffer &G_buffer, int x, int y,
 };
 
 // Randomly select neighbor pixel to merge their reservoirs with current pixel's reservoir
-void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, int x, int y, pcg32_state &rng){
-    Reservoir& current_reservoir = G_buffer(x, y);
+void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffer& target_buffer, int x, int y, pcg32_state &rng){
+    target_buffer(x, y) = G_buffer(x, y);
+
+    Reservoir& current_reservoir = target_buffer(x, y);
     if (!current_reservoir.org_vertex){
         return;
     }
 
     int max_radius = scene.options.max_radius;
+    int num_neighbors_per_update = scene.options.num_neighbors_per_update;
     Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
 
-    // Sample a neighbor
-    Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
-    Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
-    int x_ = x + std::round(radius * cos(theta));
-    int y_ = y + std::round(radius * sin(theta));
-    x_ = max(0, min(x_, scene.camera.width - 1));
-    y_ = max(0, min(y_, scene.camera.height - 1));
-    Reservoir neighbor_reservoir = G_buffer(x_, y_);
-    if (!neighbor_reservoir.org_vertex){
-        return;
+    for (int _ = 0; _ < num_neighbors_per_update; _++){
+        int patience = 3;
+        bool is_valid = false;
+        while (!is_valid && patience > 0){
+            // Sample a neighbor
+            Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
+            Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
+            int x_ = x + std::round(radius * cos(theta));
+            int y_ = y + std::round(radius * sin(theta));
+            x_ = max(0, min(x_, scene.camera.width - 1));
+            y_ = max(0, min(y_, scene.camera.height - 1));
+            Reservoir& neighbor_reservoir = G_buffer(x_, y_);
+            if (!neighbor_reservoir.org_vertex){
+                patience -= 1;
+                continue;
+            }
+            
+            // Heuristic rejection
+            PathVertex current_pv = *current_reservoir.org_vertex, neighbor_pv = *neighbor_reservoir.org_vertex;
+            Real cam_q_dis = distance(cam_org, current_pv.position);
+            Real cam_q_prime_dis = distance(cam_org, neighbor_pv.position);
+            Real depth_diff = fabs(cam_q_dis - cam_q_prime_dis);
+            Real angle_q_q_prime = std::acos(dot(neighbor_pv.geometric_normal, current_pv.geometric_normal));
+            if (depth_diff >= 0.1 * cam_q_dis || angle_q_q_prime >= Real(10) / Real(180) * c_PI){
+                patience -= 1;
+                continue;
+            }
+            is_valid = true;
+            current_reservoir.update(neighbor_reservoir.y, rng);
+        }
     }
-    
-    // Heuristic rejection
-    PathVertex current_pv = *current_reservoir.org_vertex, neighbor_pv = *neighbor_reservoir.org_vertex;
-    Real cam_q_dis = distance(cam_org, current_pv.position);
-    Real cam_q_prime_dis = distance(cam_org, neighbor_pv.position);
-    Real depth_diff = fabs(cam_q_dis - cam_q_prime_dis);
-    Real angle_q_q_prime = std::acos(dot(neighbor_pv.geometric_normal, current_pv.geometric_normal));
-    if (depth_diff / cam_q_dis >= 0.1 || angle_q_q_prime >= 10 / 180 * c_PI){
-        return;
-    }
-
-    // Combine reservoirs
-    current_reservoir.update(neighbor_reservoir.y, rng);
 };
 
 // Compute radiance for each pixel;
@@ -207,9 +228,9 @@ Spectrum compute_radiance(const Scene &scene, ReservoirBuffer& G_buffer, int x, 
     Vector3 dir_light = normalize(point_on_light.position - org_vertex.position);
     Spectrum Le = emission(light, -dir_light, Real(0), point_on_light, scene);
     Spectrum rho = eval(scene.materials[org_vertex.material_id], in_dir, dir_light, org_vertex, scene.texture_pool);
-    Real G = fabs(dot(-dir_light, point_on_light.normal)) / distance_squared(point_on_light.position, org_vertex.position);
+    Real G = max(-dot(dir_light, point_on_light.normal), Real(0)) / distance_squared(point_on_light.position, org_vertex.position);
     Real W = r.W;
-    if (W == 0){
+    if (W == 0 || isnan(W)){
         return radiance;
     }
     radiance += rho * Le * G * W;

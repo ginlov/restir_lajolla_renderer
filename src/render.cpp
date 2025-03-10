@@ -165,10 +165,11 @@ Image3 restir_render(const Scene &scene) {
     ProgressReporter reporter(spp);
     for (int _ = 0; _ < spp; _++){
         ReservoirBuffer G_buffer(w, h);
+        ReservoirBuffer G_buffer_2(w, h);
 
         // Init G_buffer and check visibility
         parallel_for([&](const Vector2i &tile){
-            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]);
+            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]*_);
             int x0 = tile[0] * tile_size;
             int x1 = min(x0 + tile_size, w);
             int y0 = tile[1] * tile_size;
@@ -185,11 +186,24 @@ Image3 restir_render(const Scene &scene) {
         int k = scene.options.neighbors_per_pixel;
 
         // Just random seed for rng
-        pcg32_state rng = init_pcg32(2357);
-        for (int __=0; __<k; __++){
+        for (int k_index=0; k_index<k; k_index++){
+            pcg32_state rng = init_pcg32(k_index);
             for (int y=0; y<h; y++){
                 for (int x=0; x<w; x++){
-                    spatial_reuse(scene, G_buffer, x, y, rng);
+                    if (k_index % 2 == 0){
+                        spatial_reuse(scene, G_buffer, G_buffer_2, x, y, rng);
+                    }
+                    else{
+                        spatial_reuse(scene, G_buffer_2, G_buffer, x, y, rng);
+                    }
+                }
+            }
+        }
+        
+        if (k % 2 == 1){
+            for (int y=0; y<h; y++){
+                for (int x=0; x<w; x++){
+                    G_buffer(x, y) = G_buffer_2(x, y);
                 }
             }
         }
