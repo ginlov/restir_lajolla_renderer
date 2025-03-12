@@ -2,7 +2,7 @@
 
 
 
-	<default name="spp" value="4" />
+	<default name="spp" value="1" />
 	<default name="resx" value="1920" />
 	<default name="resy" value="1080" />
 
@@ -12,7 +12,7 @@
 		<integer name="max_depth" value="10" />
 	</integrator> -->
 	<integrator type="restir" id="elm__0" name="elm__0">
-		<integer name="neighbors_per_pixel" value="5"/>
+		<integer name="neighbors_per_pixel" value="1"/>
 		<integer name="reservoir_size" value="32"/>
 	</integrator>
 	<sensor type="perspective" id="elm__1" name="elm__1">

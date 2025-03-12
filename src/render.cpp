@@ -169,13 +169,13 @@ Image3 restir_render(const Scene &scene) {
 
         // Init G_buffer and check visibility
         parallel_for([&](const Vector2i &tile){
-            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]*_);
             int x0 = tile[0] * tile_size;
             int x1 = min(x0 + tile_size, w);
             int y0 = tile[1] * tile_size;
             int y1 = min(y0 + tile_size, h);
             for (int y = y0; y < y1; y++) {
                 for (int x = x0; x < x1; x++) {
+                    pcg32_state rng = init_pcg32(y*w + x);
                     init_reservoir(scene, G_buffer, x, y, rng);
                 }
             }
@@ -185,7 +185,7 @@ Image3 restir_render(const Scene &scene) {
         // only use spatial information to update reservoir for each pixel
         int k = scene.options.neighbors_per_pixel;
 
-        // Just random seed for rng
+        // Spatial reuse
         for (int k_index=0; k_index<k; k_index++){
             pcg32_state rng = init_pcg32(k_index);
             for (int y=0; y<h; y++){
@@ -200,6 +200,7 @@ Image3 restir_render(const Scene &scene) {
             }
         }
         
+        // If number of neighbor sears is odd, correct G_buffer
         if (k % 2 == 1){
             for (int y=0; y<h; y++){
                 for (int x=0; x<w; x++){
