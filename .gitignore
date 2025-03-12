@@ -51,3 +51,6 @@ build/
 
 # MacOS cache
 .DS_Store
+
+# Project report folder
+project_checkpoint/

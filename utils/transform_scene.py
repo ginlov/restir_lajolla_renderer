@@ -32,8 +32,8 @@ def print_xml_elements(root):
             print_xml_elements(child)
 
 if __name__ == "__main__":
-    file_path = "scenes/car2/car.xml"
-    new_file = "scenes/car2/car2.xml"
+    file_path = "scenes/restir_test_scene2/scene.xml"
+    new_file = "scenes/restir_test_scene2/scene2.xml"
     attributes_to_transform = [
         "roughness", "subsurface", "anisotropic", "eta", "clearcoatGloss", "sheenTint", "sheen_tint",
         "specularTransmission", "specular_transmission", "specTrans", "spec_trans", "metallic", "specular",

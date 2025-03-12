@@ -150,39 +150,36 @@ void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffe
     }
 
     int max_radius = scene.options.max_radius;
-    int num_neighbors_per_update = scene.options.num_neighbors_per_update;
     Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
 
-    for (int _ = 0; _ < num_neighbors_per_update; _++){
-        int patience = 3;
-        bool is_valid = false;
-        while (!is_valid && patience > 0){
-            // Sample a neighbor
-            Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
-            Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
-            int x_ = x + std::round(radius * cos(theta));
-            int y_ = y + std::round(radius * sin(theta));
-            x_ = max(0, min(x_, scene.camera.width - 1));
-            y_ = max(0, min(y_, scene.camera.height - 1));
-            Reservoir& neighbor_reservoir = G_buffer(x_, y_);
-            if (!neighbor_reservoir.org_vertex){
-                patience -= 1;
-                continue;
-            }
-            
-            // Heuristic rejection
-            PathVertex current_pv = *current_reservoir.org_vertex, neighbor_pv = *neighbor_reservoir.org_vertex;
-            Real cam_q_dis = distance(cam_org, current_pv.position);
-            Real cam_q_prime_dis = distance(cam_org, neighbor_pv.position);
-            Real depth_diff = fabs(cam_q_dis - cam_q_prime_dis);
-            Real angle_q_q_prime = std::acos(dot(neighbor_pv.geometric_normal, current_pv.geometric_normal));
-            if (depth_diff >= 0.1 * cam_q_dis || angle_q_q_prime >= Real(10) / Real(180) * c_PI){
-                patience -= 1;
-                continue;
-            }
-            is_valid = true;
-            current_reservoir.update(neighbor_reservoir.y, rng);
+    int patience = 3;
+    bool is_valid = false;
+    while (!is_valid && patience > 0){
+        // Sample a neighbor
+        Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
+        Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
+        int x_ = x + std::round(radius * cos(theta));
+        int y_ = y + std::round(radius * sin(theta));
+        x_ = max(0, min(x_, scene.camera.width - 1));
+        y_ = max(0, min(y_, scene.camera.height - 1));
+        Reservoir& neighbor_reservoir = G_buffer(x_, y_);
+        if (!neighbor_reservoir.org_vertex){
+            patience -= 1;
+            continue;
         }
+        
+        // Heuristic rejection
+        PathVertex current_pv = *current_reservoir.org_vertex, neighbor_pv = *neighbor_reservoir.org_vertex;
+        Real cam_q_dis = distance(cam_org, current_pv.position);
+        Real cam_q_prime_dis = distance(cam_org, neighbor_pv.position);
+        Real depth_diff = fabs(cam_q_dis - cam_q_prime_dis);
+        Real angle_q_q_prime = std::acos(dot(neighbor_pv.geometric_normal, current_pv.geometric_normal));
+        if (depth_diff >= 0.1 * cam_q_dis || angle_q_q_prime >= Real(10) / Real(180) * c_PI){
+            patience -= 1;
+            continue;
+        }
+        is_valid = true;
+        current_reservoir.update(neighbor_reservoir.y, rng);
     }
 };
 

@@ -1,0 +1,513 @@
+<scene version="2.1.0">
+
+
+
+	<default name="spp" value="4" />
+	<default name="resx" value="1920" />
+	<default name="resy" value="1080" />
+
+
+
+	<!-- <integrator type="path" id="elm__0" name="elm__0">
+		<integer name="max_depth" value="10" />
+	</integrator> -->
+	<integrator type="restir" id="elm__0" name="elm__0">
+		<integer name="neighbors_per_pixel" value="5"/>
+		<integer name="reservoir_size" value="32"/>
+	</integrator>
+	<sensor type="perspective" id="elm__1" name="elm__1">
+		<string name="fov_axis" value="x" />
+		<float name="fov" value="39.597755" />
+		<float name="principal_point_offset_x" value="0.000000" />
+		<float name="principal_point_offset_y" value="-0.000000" />
+		<float name="near_clip" value="0.100000" />
+		<float name="far_clip" value="100.000000" />
+		<transform name="to_world">
+			<rotate x="1" angle="-153.5592908827048" />
+			<rotate y="1" angle="-46.691938147394204" />
+			<rotate z="1" angle="-179.999991348578" />
+			<translate value="20.633776 18.087088 19.057365" />
+		</transform>
+		<sampler type="independent" name="sampler">
+			<integer name="sample_count" value="$spp" />
+		</sampler>
+		<film type="hdrfilm" name="film">
+			<integer name="width" value="$resx" />
+			<integer name="height" value="$resy" />
+		</film>
+	</sensor>
+
+
+
+	<bsdf type="twosided" id="mat-Material.001" name="mat-Material.001">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.800243 0.157463 0.334422" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.004" name="mat-Material.004">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.735516 0.021296 0.800007" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.003" name="mat-Material.003">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.767382 0.800023 0.244625" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.002" name="mat-Material.002">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.030993 0.800007 0.560749" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="diffuse" id="empty-emitter-bsdf" name="empty-emitter-bsdf">
+		<rgb value="0.000000" name="reflectance" />
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.046" name="mat-Material.046">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.089342 0.073681 0.800007" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.047" name="mat-Material.047">
+		<bsdf type="diffuse" name="bsdf">
+			<!-- <rgb value="0.800047 0.087639 0.631266" name="base_color" />
+			<float name="spec_trans" value="0.000000" />
+			<float name="metallic" value="0.000000" />
+			<float name="anisotropic" value="0.000000" />
+			<float name="roughness" value="0.250000" />
+			<float name="sheen" value="0.000000" />
+			<float name="clearcoat" value="0.000000" />
+			<float name="clearcoat_gloss" value="0.000900" />
+			<float name="specular" value="0.500000" />
+		<float value="1.000000" name="spec_tint" /><float value="1.000000" name="sheen_tint" /> -->
+		<rgb name="reflectance" value="0.8 0.8 0.8"/>
+		</bsdf>
+	</bsdf>
+	<bsdf type="twosided" id="mat-Material.048" name="mat-Material.048">
+		<bsdf type="diffuse" name="bsdf">
+			<rgb value="0.003816 0.000000 0.800119" name="reflectance" />
+		</bsdf>
+	</bsdf>
+	<bsdf type="roughdielectric" id="mat-Material.049" name="mat-Material.049">
+		<float name="alpha" value="0.250000" />
+		<string name="distribution" value="ggx" />
+		<float name="int_ior" value="1.500000" />
+		<rgb value="0.000000 1.000000 0.168515" name="specular_transmittance" />
+	</bsdf>
+
+
+
+	<shape type="ply" id="elm__11" name="elm__11">
+		<string name="filename" value="meshes/Sphere.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__12" name="elm__12">
+		<string name="filename" value="meshes/Sphere_001.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__13" name="elm__13">
+		<string name="filename" value="meshes/Sphere_002.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__14" name="elm__14">
+		<string name="filename" value="meshes/Sphere_003.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__15" name="elm__15">
+		<string name="filename" value="meshes/Sphere_004.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__16" name="elm__16">
+		<string name="filename" value="meshes/Sphere_005.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__17" name="elm__17">
+		<string name="filename" value="meshes/Sphere_006.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__18" name="elm__18">
+		<string name="filename" value="meshes/Sphere_007.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__19" name="elm__19">
+		<string name="filename" value="meshes/Sphere_008.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__20" name="elm__20">
+		<string name="filename" value="meshes/Sphere_009.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__21" name="elm__21">
+		<string name="filename" value="meshes/Sphere_010.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__22" name="elm__22">
+		<string name="filename" value="meshes/Sphere_011.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__23" name="elm__23">
+		<string name="filename" value="meshes/Sphere_012.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__24" name="elm__24">
+		<string name="filename" value="meshes/Sphere_013.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__25" name="elm__25">
+		<string name="filename" value="meshes/Sphere_014.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__26" name="elm__26">
+		<string name="filename" value="meshes/Sphere_015.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__27" name="elm__27">
+		<string name="filename" value="meshes/Sphere_016.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="10.000000 0.826459 2.044735" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__28" name="elm__28">
+		<string name="filename" value="meshes/Sphere_017.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__29" name="elm__29">
+		<string name="filename" value="meshes/Sphere_018.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__30" name="elm__30">
+		<string name="filename" value="meshes/Sphere_019.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__31" name="elm__31">
+		<string name="filename" value="meshes/Sphere_020.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__32" name="elm__32">
+		<string name="filename" value="meshes/Sphere_021.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__33" name="elm__33">
+		<string name="filename" value="meshes/Sphere_022.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__34" name="elm__34">
+		<string name="filename" value="meshes/Sphere_023.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__35" name="elm__35">
+		<string name="filename" value="meshes/Sphere_024.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__36" name="elm__36">
+		<string name="filename" value="meshes/Sphere_025.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__37" name="elm__37">
+		<string name="filename" value="meshes/Sphere_026.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__38" name="elm__38">
+		<string name="filename" value="meshes/Sphere_027.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__39" name="elm__39">
+		<string name="filename" value="meshes/Sphere_028.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__40" name="elm__40">
+		<string name="filename" value="meshes/Sphere_029.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__41" name="elm__41">
+		<string name="filename" value="meshes/Sphere_030.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__42" name="elm__42">
+		<string name="filename" value="meshes/Sphere_031.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="0.323088 7.000000 4.895751" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__43" name="elm__43">
+		<string name="filename" value="meshes/Sphere_032.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__44" name="elm__44">
+		<string name="filename" value="meshes/Sphere_033.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__45" name="elm__45">
+		<string name="filename" value="meshes/Sphere_034.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__46" name="elm__46">
+		<string name="filename" value="meshes/Sphere_035.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__47" name="elm__47">
+		<string name="filename" value="meshes/Sphere_036.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__48" name="elm__48">
+		<string name="filename" value="meshes/Sphere_037.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__49" name="elm__49">
+		<string name="filename" value="meshes/Sphere_038.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+	<shape type="ply" id="elm__50" name="elm__50">
+		<string name="filename" value="meshes/Sphere_039.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="empty-emitter-bsdf" name="bsdf" />
+		<emitter type="area" name="emitter">
+			<rgb value="8.000000 6.633070 0.270933" name="radiance" />
+		</emitter>
+	</shape>
+
+
+
+	<shape type="ply" id="elm__3" name="elm__3">
+		<string name="filename" value="meshes/Plane.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.001" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__5" name="elm__5">
+		<string name="filename" value="meshes/Plane_001.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.004" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__7" name="elm__7">
+		<string name="filename" value="meshes/Plane_002.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.003" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__9" name="elm__9">
+		<string name="filename" value="meshes/Plane_003.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.002" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__52" name="elm__52">
+		<string name="filename" value="meshes/Suzanne.ply" />
+		<ref id="mat-Material.046" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__54" name="elm__54">
+		<string name="filename" value="meshes/Suzanne_001.ply" />
+		<ref id="mat-Material.047" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__56" name="elm__56">
+		<string name="filename" value="meshes/Torus.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.048" name="bsdf" />
+	</shape>
+	<shape type="ply" id="elm__58" name="elm__58">
+		<string name="filename" value="meshes/Cylinder.ply" />
+		<boolean name="face_normals" value="true" />
+		<ref id="mat-Material.049" name="bsdf" />
+	</shape>
+
+
+
+</scene>
