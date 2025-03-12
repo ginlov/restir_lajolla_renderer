@@ -82,8 +82,7 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
         Vector2 rng_uv_params(next_pcg32_real<Real>(rng), next_pcg32_real<Real>(rng));
         Real rng_w_param = next_pcg32_real<Real>(rng);
         PointAndNormal x = sample_point_on_light(light, q.position, rng_uv_params, rng_w_param, scene);
-        Vector3 dir_to_light = normalize(x.position - q.position);
-
+        
         // Calculate p
         Real p = light_pmf(scene, light_id) * pdf_point_on_light(light, x, q.position, scene);
         
@@ -91,8 +90,9 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
         if ( p <= 0){
             continue;
         }
-        
+
         // Calculate p_hat
+        Vector3 dir_to_light = normalize(x.position - q.position);
         Spectrum Le = emission(light, -dir_to_light, Real(0), x, scene);
         Spectrum rho = eval(scene.materials[q.material_id], -ray.dir, dir_to_light, q, scene.texture_pool);
 
