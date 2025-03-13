@@ -12,7 +12,7 @@ struct ReservoirSample {
     Real w;
 
     ReservoirSample(): light_id(-1), x(PointAndNormal()), p_hat(0), w(0) {};
-    ReservoirSample(int light_id, PointAndNormal x, Real p_hat, Real w) : light_id(light_id), x(x), p_hat(p_hat),  w(w) {}
+    ReservoirSample(int light_id, PointAndNormal x, Real p_hat, Real w) : light_id(light_id), x(x), p_hat(p_hat), w(w) {};
 };
 
 struct Reservoir {
@@ -21,17 +21,18 @@ struct Reservoir {
     ReservoirSample y;
     Real W;
     Real w_sum;
+    Vector2 screen_pos;
 
-    Reservoir(): M(0), org_vertex({}), y(ReservoirSample()), W(0), w_sum(0) {};
-    Reservoir(int M, PathVertex org_vertex, ReservoirSample y, Real W, Real w_sum) : M(M), org_vertex(org_vertex), y(y), W(W), w_sum(w_sum) {}
+    Reservoir(): M(0), org_vertex({}), y(ReservoirSample()), W(0), w_sum(0), screen_pos(Vector2{Real(0), Real(0)}) {};
+    Reservoir(int M, PathVertex org_vertex, ReservoirSample y, Real W, Real w_sum, Vector2 screen_pos) : M(M), org_vertex(org_vertex), y(y), W(W), w_sum(w_sum), screen_pos(screen_pos) {}
 
     // TODO: If neighbor sample is on another object, reject it
-    void update(const ReservoirSample& candidate, pcg32_state& rng){
+    void update(const ReservoirSample& candidate, pcg32_state& rng, int num_candidates=1){
         if (candidate.light_id == -1){
             return;
         }
         w_sum += candidate.w;
-        M += 1;
+        M += num_candidates;
         Real random_cdf = next_pcg32_real<Real>(rng);
         if (random_cdf < candidate.w / w_sum){
             y = candidate;
@@ -67,8 +68,31 @@ struct ReservoirBuffer {
     std::vector<Reservoir> data;
 };
 
+// Compute p_hat
+Real compute_p_hat(const Scene& scene, Reservoir& reservoir, int light_id, PointAndNormal x, pcg32_state &rng) {
+    if (!reservoir.org_vertex){
+        // If the vertex is invalid, return 0
+        return Real(0);
+    }
+
+    PathVertex vertex = *reservoir.org_vertex;
+    Ray in_ray = sample_primary(scene.camera, reservoir.screen_pos);
+    Ray shadow_ray{vertex.position, normalize(x.position - vertex.position), get_shadow_epsilon(scene), 
+        (1-get_shadow_epsilon(scene)) * distance(x.position, vertex.position)};
+    Vector3 dir_light = normalize(x.position - vertex.position);
+    Real G = 0;
+    if (!occluded(scene, shadow_ray)){
+        G = max(-dot(dir_light, x.normal), Real(0)) / distance_squared(x.position, vertex.position);
+    }
+
+    Spectrum Le = emission(scene.lights[light_id], -dir_light, Real(0), x, scene);
+    Spectrum rho = eval(scene.materials[vertex.material_id], -in_ray.dir, dir_light, vertex, scene.texture_pool);
+    Real p_hat = luminance(rho * Le) * G;
+    return p_hat;
+}
+
 // Algorithm 3: Streaming RIS using weighted reservoir sampling
-void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathVertex q, Ray ray, pcg32_state &rng) {
+void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathVertex q, Ray ray, Vector2 screen_pos, pcg32_state &rng) {
     // Sample M light paths candidates
     for (int i=1; i<M+1; i++){
         int light_id = sample_light(scene, next_pcg32_real<Real>(rng));
@@ -92,18 +116,7 @@ void resample_importance_sampling(int M, const Scene &scene, Reservoir &r, PathV
         }
 
         // Calculate p_hat
-        Vector3 dir_to_light = normalize(x.position - q.position);
-        Spectrum Le = emission(light, -dir_to_light, Real(0), x, scene);
-        Spectrum rho = eval(scene.materials[q.material_id], -ray.dir, dir_to_light, q, scene.texture_pool);
-
-        // Check visibility
-        Ray shadow_ray{q.position, normalize(x.position - q.position), get_shadow_epsilon(scene), 
-            (1-get_shadow_epsilon(scene)) * distance(x.position, q.position)};
-        Real G = 0;
-        if (!occluded(scene, shadow_ray)){
-            G = max(-dot(dir_to_light, x.normal), Real(0)) / distance_squared(x.position, q.position);
-        }
-        Real p_hat = luminance(Le * rho) * G;
+        Real p_hat = compute_p_hat(scene, r, light_id, x, rng);
 
         // Update reservoir
         Real w_x = p_hat / p;
@@ -117,6 +130,7 @@ void init_reservoir(const Scene &scene, ReservoirBuffer &G_buffer, int x, int y,
     int w = scene.camera.width, h = scene.camera.height;
     Vector2 screen_pos((x + next_pcg32_real<Real>(rng)) / w,
                        (y + next_pcg32_real<Real>(rng)) / h);
+    r.screen_pos = screen_pos;
     Ray ray = sample_primary(scene.camera, screen_pos);
     RayDifferential ray_diff = init_ray_differential(w, h);
 
@@ -130,7 +144,7 @@ void init_reservoir(const Scene &scene, ReservoirBuffer &G_buffer, int x, int y,
     
     PathVertex vertex = *vertex_;
     r.org_vertex = vertex;
-    resample_importance_sampling(scene.options.reservoir_size, scene, r, vertex, ray, rng);
+    resample_importance_sampling(scene.options.reservoir_size, scene, r, vertex, ray, screen_pos, rng);
     
     // check visibility for the light source of reservoir sample
     Ray shadow_ray{vertex.position, normalize(r.y.x.position - vertex.position), get_shadow_epsilon(scene), 
@@ -139,6 +153,35 @@ void init_reservoir(const Scene &scene, ReservoirBuffer &G_buffer, int x, int y,
         r.W = 0;
     }
 };
+
+// Merge two reservoirs
+void merge_reservoirs(const Scene& scene, Reservoir& source_reservoir, Reservoir merged_reservoir, pcg32_state &rng){
+    if (!source_reservoir.org_vertex){
+        return;
+    }
+
+    ReservoirSample merged_sample = merged_reservoir.y;
+    if (merged_sample.light_id == -1){
+        return;
+    }
+
+    Real p_hat = compute_p_hat(scene, source_reservoir, merged_sample.light_id, merged_sample.x, rng);
+    Real w = p_hat * merged_reservoir.W * merged_reservoir.M;
+    merged_sample.p_hat = p_hat;
+    merged_sample.w = w;
+
+    source_reservoir.update(merged_sample, rng, merged_reservoir.M);
+
+    // correct bias
+    int Z = 0;
+    if (compute_p_hat(scene, source_reservoir, source_reservoir.y.light_id, source_reservoir.y.x, rng) > 0){
+        Z += source_reservoir.M - merged_reservoir.M;
+    }
+    if (compute_p_hat(scene, merged_reservoir, source_reservoir.y.light_id, source_reservoir.y.x, rng) > 0){
+        Z += merged_reservoir.M;
+    }
+    source_reservoir.W = source_reservoir.W * source_reservoir.M / Z;
+}
 
 // Randomly select neighbor pixel to merge their reservoirs with current pixel's reservoir
 void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffer& target_buffer, int x, int y, pcg32_state &rng){
@@ -179,7 +222,9 @@ void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffe
             continue;
         }
         is_valid = true;
-        current_reservoir.update(neighbor_reservoir.y, rng);
+
+        // Merge two reservoirs
+        merge_reservoirs(scene, current_reservoir, neighbor_reservoir, rng);
     }
 };
 
