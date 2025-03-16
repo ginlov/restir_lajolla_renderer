@@ -3,8 +3,6 @@
 #include <vector>
 #include "transform.h"
 
-using Sample = Vector2;
-
 struct ReservoirSample {
     int light_id;
     PointAndNormal x;
