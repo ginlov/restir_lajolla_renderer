@@ -57,6 +57,7 @@ set(SRCS src/3rdparty/miniz.h
          src/filter.h
          src/flexception.h
          src/frame.h
+         src/halton_seq.h
          src/image.h
          src/intersection.h
          src/lajolla.h

@@ -184,31 +184,18 @@ Image3 restir_render(const Scene &scene) {
 
         // Since we do not render animation
         // only use spatial information to update reservoir for each pixel
-        int k = scene.options.neighbors_per_pixel;
+        pcg32_state rng = init_pcg32(0);
+        for (int y=0; y<h; y++){
+            for (int x=0; x<w; x++){
+                spatial_reuse(scene, G_buffer, G_buffer_2, x, y, rng);
+            }
+        }
 
-        // Spatial reuse
-        for (int k_index=0; k_index<k; k_index++){
-            pcg32_state rng = init_pcg32(k_index);
-            for (int y=0; y<h; y++){
-                for (int x=0; x<w; x++){
-                    if (k_index % 2 == 0){
-                        spatial_reuse(scene, G_buffer, G_buffer_2, x, y, rng);
-                    }
-                    else{
-                        spatial_reuse(scene, G_buffer_2, G_buffer, x, y, rng);
-                    }
-                }
-            }
-        }
-        
-        // If number of neighbor sears is odd, correct G_buffer
-        if (k % 2 == 1){
-            for (int y=0; y<h; y++){
-                for (int x=0; x<w; x++){
-                    G_buffer(x, y) = G_buffer_2(x, y);
-                }
-            }
-        }
+        // for (int y=0; y<h; y++){
+        //     for (int x=0; x<w; x++){
+        //         G_buffer(x, y) = G_buffer_2(x, y);
+        //     }
+        // }
 
         // compute radiance for each pixel
         parallel_for([&](const Vector2i &tile){
@@ -219,7 +206,7 @@ Image3 restir_render(const Scene &scene) {
             int y1 = min(y0 + tile_size, h);
             for (int y = y0; y < y1; y++) {
                 for (int x = x0; x < x1; x++) {
-                    Spectrum L = compute_radiance(scene, G_buffer, x, y, rng);
+                    Spectrum L = compute_radiance(scene, G_buffer_2, x, y, rng);
                     img(x, y) += L;
                 }
             }
