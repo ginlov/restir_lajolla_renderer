@@ -74,9 +74,12 @@ set(SRCS src/3rdparty/miniz.h
          src/point_and_normal.h
          src/ray.h
          src/render.h
+         src/reservoir.h
          src/restir_tracing.h
+         src/restir_pt_tracing.h
          src/scene.h
          src/shape.h
+         src/shift_mapping.h
          src/spectrum.h
          src/table_dist.h
          src/texture.h

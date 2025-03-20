@@ -4,6 +4,7 @@
 #include "parallel.h"
 #include "path_tracing.h"
 #include "restir_tracing.h"
+#include "restir_pt_tracing.h"
 #include "vol_path_tracing.h"
 #include "pcg.h"
 #include "progress_reporter.h"
@@ -242,6 +243,97 @@ Image3 restir_render(const Scene &scene) {
     return img;
 }
 
+Image3 restir_pt_render(const Scene &scene){
+    int w = scene.camera.width, h = scene.camera.height;
+    int max_depth = scene.options.max_depth;
+    Image3 img(w, h);
+
+    constexpr int tile_size = 16;
+    int num_tiles_x = (w + tile_size - 1) / tile_size;
+    int num_tiles_y = (h + tile_size - 1) / tile_size;
+
+    int spp = scene.options.samples_per_pixel;
+    // For each pixel, sample spp light paths
+    ProgressReporter reporter(spp);
+    for (int _ = 0; _ < spp; _++){
+        ReservoirPTBuffer G_buffer(w, h);
+        ReservoirPTBuffer G_buffer_2(w, h);
+
+        // Init G_buffer and check visibility
+        parallel_for([&](const Vector2i &tile){
+            int x0 = tile[0] * tile_size;
+            int x1 = min(x0 + tile_size, w);
+            int y0 = tile[1] * tile_size;
+            int y1 = min(y0 + tile_size, h);
+            for (int y = y0; y < y1; y++) {
+                for (int x = x0; x < x1; x++) {
+                    pcg32_state rng = init_pcg32(y*w + x);
+                    init_reservoir_pt(scene, G_buffer, x, y, max_depth, rng);
+                }
+            }
+        }, Vector2i(num_tiles_x, num_tiles_y));
+
+        // Since we do not render animation
+        // only use spatial information to update reservoir for each pixel
+        int k = scene.options.neighbors_per_pixel;
+
+        // Spatial reuse
+        for (int k_index=0; k_index<k; k_index++){
+            pcg32_state rng = init_pcg32(k_index);
+            for (int y=0; y<h; y++){
+                for (int x=0; x<w; x++){
+                    if (k_index % 2 == 0){
+                        spatial_reuse_pt(scene, G_buffer, G_buffer_2, x, y, rng);
+                    }
+                    else{
+                        spatial_reuse_pt(scene, G_buffer_2, G_buffer, x, y, rng);
+                    }
+                }
+            }
+        }
+        
+        // If number of neighbor sears is odd, correct G_buffer
+        if (k % 2 == 1){
+            for (int y=0; y<h; y++){
+                for (int x=0; x<w; x++){
+                    G_buffer(x, y) = G_buffer_2(x, y);
+                }
+            }
+        }
+
+        // compute radiance for each pixel
+        parallel_for([&](const Vector2i &tile){
+            pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]);
+            int x0 = tile[0] * tile_size;
+            int x1 = min(x0 + tile_size, w);
+            int y0 = tile[1] * tile_size;
+            int y1 = min(y0 + tile_size, h);
+            for (int y = y0; y < y1; y++) {
+                for (int x = x0; x < x1; x++) {
+                    Spectrum L = compute_radiance(scene, G_buffer, x, y, rng);
+                    img(x, y) += L;
+                }
+            }
+        }, Vector2i(num_tiles_x, num_tiles_y));
+        reporter.update(1);
+    }
+    reporter.done();
+
+    // Post-processing, divide the radiance of each pixel by spp
+    parallel_for([&](const Vector2i &tile){
+        int x0 = tile[0] * tile_size;
+        int x1 = min(x0 + tile_size, w);
+        int y0 = tile[1] * tile_size;
+        int y1 = min(y0 + tile_size, h);
+        for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; x++) {
+                img(x, y) = img(x, y) / Real(spp);
+            }
+        }
+    }, Vector2i(num_tiles_x, num_tiles_y));
+    return img;
+}
+
 Image3 render(const Scene &scene) {
     if (scene.options.integrator == Integrator::Depth ||
             scene.options.integrator == Integrator::ShadingNormal ||
@@ -255,6 +347,8 @@ Image3 render(const Scene &scene) {
         return vol_path_render(scene);
     } else if (scene.options.integrator == Integrator::ReSTIR) {
         return restir_render(scene);
+    } else if (scene.options.integrator == Integrator::ReSTIR_PT) {
+        return restir_pt_render(scene);
     } else {
         assert(false);
         return Image3();

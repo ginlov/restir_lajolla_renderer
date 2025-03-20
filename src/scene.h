@@ -19,7 +19,8 @@ enum class Integrator {
     MipmapLevel,
     Path,
     VolPath,
-    ReSTIR
+    ReSTIR,
+    ReSTIR_PT
 };
 
 struct RenderOptions {
@@ -32,6 +33,7 @@ struct RenderOptions {
     int neighbors_per_pixel = 3;
     int reservoir_size = 32;
     int max_radius = 30;
+    int m_capping = 36;
 };
 
 /// Bounding sphere

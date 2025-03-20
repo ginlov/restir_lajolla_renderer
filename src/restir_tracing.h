@@ -2,69 +2,7 @@
 
 #include <vector>
 #include "transform.h"
-
-struct ReservoirSample {
-    int light_id;
-    PointAndNormal x;
-    Real p_hat;
-    Real w;
-
-    ReservoirSample(): light_id(-1), x(PointAndNormal()), p_hat(0), w(0) {};
-    ReservoirSample(int light_id, PointAndNormal x, Real p_hat, Real w) : light_id(light_id), x(x), p_hat(p_hat), w(w) {};
-};
-
-struct Reservoir {
-    int M;
-    std::optional<PathVertex> org_vertex;
-    ReservoirSample y;
-    Real W;
-    Real w_sum;
-    Vector2 screen_pos;
-
-    Reservoir(): M(0), org_vertex({}), y(ReservoirSample()), W(0), w_sum(0), screen_pos(Vector2{Real(0), Real(0)}) {};
-    Reservoir(int M, PathVertex org_vertex, ReservoirSample y, Real W, Real w_sum, Vector2 screen_pos) : M(M), org_vertex(org_vertex), y(y), W(W), w_sum(w_sum), screen_pos(screen_pos) {}
-
-    // TODO: If neighbor sample is on another object, reject it
-    void update(const ReservoirSample& candidate, pcg32_state& rng, int num_candidates=1){
-        if (candidate.light_id == -1){
-            return;
-        }
-        w_sum += candidate.w;
-        M += num_candidates;
-        Real random_cdf = next_pcg32_real<Real>(rng);
-        if (random_cdf < candidate.w / w_sum){
-            y = candidate;
-            W = w_sum / (M * y.p_hat);
-        }
-    }
-};
-
-struct ReservoirBuffer {
-    ReservoirBuffer() {};
-    ReservoirBuffer(int width, int height): width(width), height(height) {
-        data.resize(width * height, Reservoir());
-    }
-
-    Reservoir &operator()(int x, int y) {
-        return data[y * width + x];
-    }
-
-    const Reservoir &operator()(int x, int y) const {
-        return data[y * width + x];
-    }
-
-    Reservoir &operator()(int x) {
-        return data[x];
-    }
-
-    const Reservoir &operator()(int x) const {
-        return data[x];
-    }
-
-    int width;
-    int height;
-    std::vector<Reservoir> data;
-};
+#include "reservoir.h"
 
 // Compute p_hat
 Real compute_p_hat(const Scene& scene, Reservoir& reservoir, int light_id, PointAndNormal x, pcg32_state &rng) {
