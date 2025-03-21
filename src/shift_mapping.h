@@ -35,7 +35,15 @@ ReservoirPTSample reconnection_shift_mapping(const Scene &scene, ReservoirPT sou
     Spectrum radiance = make_zero_spectrum();
     // If is light, account for the emission
     if (is_light(scene.shapes[x1.shape_id])){
-        radiance += emission(x1, dir_view, scene);
+        int light_id = get_area_light_id(scene.shapes[x1.shape_id]);
+        const Light& light = scene.lights[light_id];
+        Real p2 = light_pmf(scene, light_id) * pdf_point_on_light(light, PointAndNormal{x1.position, x1.geometric_normal}, y.position, scene);
+        Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
+        Real G = fabs(dot(dir_view, x1.geometric_normal)) /
+            distance_squared(x1.position, y.position);
+        Real bsdf_pdf = pdf_sample_bsdf(scene.materials[y.material_id], normalize(cam_org - y.position), -dir_view, y, scene.texture_pool) * G;
+        Real w = (bsdf_pdf * bsdf_pdf) / (p2 * p2 + bsdf_pdf * bsdf_pdf);
+        radiance += w*emission(x1, dir_view, scene);
     }
 
     // NEE

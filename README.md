@@ -1,5 +1,5 @@
-# lajolla
-UCSD CSE 272 renderer
+# ReSTIR and ReSTIR PT with lajolla
+[ReSTIR](https://research.nvidia.com/labs/rtr/publication/bitterli2020spatiotemporal/) and [ReSTIR PT](https://research.nvidia.com/labs/rtr/publication/lin2022generalized/) implementation on [lajolla](https://github.com/BachiLi/lajolla_public) renderer
 
 # Build
 All the dependencies are included. Use CMake to build.
@@ -24,19 +24,9 @@ This will generate an image "image.exr".
 
 To view the image, use [hdrview](https://github.com/wkjarosz/hdrview), or [tev](https://github.com/Tom94/tev).
 
-# Acknowledgement
-The renderer is heavily inspired by [pbrt](https://pbr-book.org/), [mitsuba](http://www.mitsuba-renderer.org/index_old.html), and [SmallVCM](http://www.smallvcm.com/).
+# ReSTIR and ReSTIR PT
+ReSTIR and ReSTIR PT are implemented with just spatial reuse, since lajolla is built to render images only.
 
-We use [Embree](https://www.embree.org/) for ray casting.
+Checkout scene file "scenes/restir_test_scene2/scene2.xml" for the parameter of ReSTIR and ReSTIR PT.
 
-We use [pugixml](https://pugixml.org/) to parse XML files.
-
-We use [pcg](https://www.pcg-random.org/) for random number generation.
-
-We use [stb_image](https://github.com/nothings/stb) and [tinyexr](https://github.com/syoyo/tinyexr) for reading & writing images.
-
-We use [miniz](https://github.com/richgel999/miniz) for compression & decompression.
-
-We use [tinyply](https://github.com/ddiakopoulos/tinyply) for parsing PLY files.
-
-Many scenes in the scenes folder are directly downloaded from [http://www.mitsuba-renderer.org/download.html](http://www.mitsuba-renderer.org/download.html). Scenes courtesy of Wenzel Jakob, Cornell Program of Computer Graphics, Marko Dabrovic, Eric Veach, Jonas Pilo, and Bernhard Vogl.
+While ReSTIR is implemented exactly same as presented in the paper, ReSTIR PT is implemented with some specific choices and limitations, please take a look at the report file for more details.

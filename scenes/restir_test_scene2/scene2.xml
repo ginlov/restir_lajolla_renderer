@@ -11,16 +11,16 @@
 	<!-- <integrator type="path" id="elm__0" name="elm__0">
 		<integer name="max_depth" value="10" />
 	</integrator> -->
-	<integrator type="restir" id="elm__0" name="elm__0">
+	<!-- <integrator type="restir" id="elm__0" name="elm__0">
 		<integer name="neighbors_per_pixel" value="1"/>
 		<integer name="reservoir_size" value="32"/>
-	</integrator>
-	<!-- <integrator type="restir_pt" id="elm__0" name="elm__0">
+	</integrator> -->
+	<integrator type="restir_pt" id="elm__0" name="elm__0">
 		<integer name="m_capping" value="36"/>
 		<integer name="max_depth" value="10"/>
 		<integer name="neighbors_per_pixel" value="3"/>
 		<integer name="reservoir_size" value="32"/>
-	</integrator> -->
+	</integrator>
 	<sensor type="perspective" id="elm__1" name="elm__1">
 		<string name="fov_axis" value="x" />
 		<float name="fov" value="39.597755" />
