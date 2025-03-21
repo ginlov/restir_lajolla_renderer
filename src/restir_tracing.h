@@ -129,12 +129,7 @@ void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffe
         return;
     }
 
-    int k = scene.options.neighbors_per_pixel;
-    int max_radius = scene.options.max_radius;
     Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
-
-    int patience = 3;
-    bool is_valid = false;
 
     std::vector<std::pair<int, int>> neighbors = sample_low_discrepancy_neighbors(scene.options.neighbors_per_pixel, x, y, scene.options.max_radius, scene.camera.width, scene.camera.height);
     if (neighbors.size() == 0){
@@ -160,7 +155,6 @@ void spatial_reuse(const Scene &scene, ReservoirBuffer& G_buffer, ReservoirBuffe
         if (depth_diff >= 0.1 * cam_q_dis || angle_q_q_prime >= Real(10) / Real(180) * c_PI){
             continue;
         }
-        is_valid = true;
 
         // Merge two reservoirs
         merge_reservoirs(scene, current_reservoir, neighbor_reservoir, rng);

@@ -21,8 +21,8 @@ std::tuple<Spectrum, Vector3, Spectrum> visit_vertex(const Scene &scene, Ray ray
         int light_id = get_area_light_id(scene.shapes[current_vertex.shape_id]);
         const Light& light = scene.lights[light_id];
         Real p2 = light_pmf(scene, light_id) * pdf_point_on_light(light, PointAndNormal{current_vertex.position, current_vertex.geometric_normal}, prev_vertex.position, scene);
-        Real w = (p2 * p2) / (p2 * p2 + bsdf_pdf * bsdf_pdf);
-        curr_ver_radiance += emission(current_vertex, -ray.dir, scene);
+        Real w = (bsdf_pdf * bsdf_pdf) / (p2 * p2 + bsdf_pdf * bsdf_pdf);
+        curr_ver_radiance += w * emission(current_vertex, -ray.dir, scene);
     }
 
     const Material &mat = scene.materials[current_vertex.material_id];
@@ -349,29 +349,8 @@ void spatial_reuse_pt(const Scene &scene, ReservoirPTBuffer &G_buffer, Reservoir
     if (!current_reservoir.org_vertex){
         return;
     }
-    
-    // int max_radius = scene.options.max_radius;
-    // int patience = 3;
-    // bool is_valid = false;
-    // while (!is_valid && patience > 0){
-    //     // Sample a neighbor
-    //     Real theta = next_pcg32_real<Real>(rng) * 2 * M_PI;
-    //     Real radius = next_pcg32_real<Real>(rng) * Real(max_radius);
-    //     int x_ = x + std::round(radius * cos(theta));
-    //     int y_ = y + std::round(radius * sin(theta));
-    //     x_ = max(0, min(x_, scene.camera.width - 1));
-    //     y_ = max(0, min(y_, scene.camera.height - 1));
-    //     ReservoirPT& neighbor_reservoir = G_buffer(x_, y_);
-        
-    //     // If the neighbor has no vertex tagged with or is empty, stop merging
-    //     if (!neighbor_reservoir.org_vertex || neighbor_reservoir.M == 0){
-    //         patience -= 1;
-    //         continue;
-    //     }
 
-    //     is_valid = true;
-    //     merge_reservoirs_pt(scene, current_reservoir, neighbor_reservoir, rng);
-    // }
+    Vector3 cam_org = xform_point(scene.camera.cam_to_world, Vector3{0, 0, 0});
 
     std::vector<std::pair<int, int>> neighbors = sample_low_discrepancy_neighbors(scene.options.neighbors_per_pixel, x, y, scene.options.max_radius, scene.camera.width, scene.camera.height);
     if (neighbors.size() == 0){
@@ -384,6 +363,15 @@ void spatial_reuse_pt(const Scene &scene, ReservoirPTBuffer &G_buffer, Reservoir
         int y_ = neighbors[i].second;
         ReservoirPT& neighbor_reservoir = G_buffer(x_, y_);
         if (!neighbor_reservoir.org_vertex || neighbor_reservoir.M == 0){
+            continue;
+        }
+
+        PathVertex current_pv = *current_reservoir.org_vertex, neighbor_pv = *neighbor_reservoir.org_vertex;
+        Real cam_q_dis = distance(cam_org, current_pv.position);
+        Real cam_q_prime_dis = distance(cam_org, neighbor_pv.position);
+        Real depth_diff = fabs(cam_q_dis - cam_q_prime_dis);
+        Real angle_q_q_prime = std::acos(dot(neighbor_pv.geometric_normal, current_pv.geometric_normal));
+        if (depth_diff >= 0.1 * cam_q_dis || angle_q_q_prime >= Real(10) / Real(180) * c_PI){
             continue;
         }
 
