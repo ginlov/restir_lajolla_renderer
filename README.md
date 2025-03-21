@@ -27,6 +27,6 @@ To view the image, use [hdrview](https://github.com/wkjarosz/hdrview), or [tev](
 # ReSTIR and ReSTIR PT
 ReSTIR and ReSTIR PT are implemented with just spatial reuse, since lajolla is built to render images only.
 
-Checkout scene file "scenes/restir_test_scene2/scene2.xml" for the parameter of ReSTIR and ReSTIR PT.
+Checkout scene file "scenes/restir_test_scene2/scene2.xml" for the parameters of ReSTIR and ReSTIR PT.
 
 While ReSTIR is implemented exactly same as presented in the paper, ReSTIR PT is implemented with some specific choices and limitations, please take a look at the report file for more details.
