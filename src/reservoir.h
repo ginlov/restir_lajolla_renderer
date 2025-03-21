@@ -67,18 +67,18 @@ struct ReservoirBuffer {
 
 // For now: ReservoirPTSample only support reconnection shift
 struct ReservoirPTSample {
-    Spectrum F; // Cached integrand value of the sample.
+    Spectrum F; // Cached integrand value of the sample (original vertex). F = f * L * G
     Vector2 rnd_param_uv; // random uv_param at hit x1.
     Real rnd_param_w; // random w_param at hit x1.
-    Real p_hat;
+    Real p_hat; // p_hat of the light path on current domain (i.e, domain of original vertex).
 
     // Reconnection infomation
-    std::optional<PathVertex> reconnection_vertex;
-    Vector3 recon_out_dir;
-    Spectrum recon_next_ver_radiance;
-    Vector2 recon_nee_light_uv;
-    Real recon_nee_light_w;
-    Real recon_nee_shape_w;
+    std::optional<PathVertex> reconnection_vertex; // also x1 since we only support reconnection shift.
+    Vector3 recon_out_dir; // out_dir bsdf at x1.
+    Spectrum recon_next_ver_radiance; // next vertex radiance at x1.
+    Vector2 recon_nee_light_uv; // nee light uv at x1 to recalculate nee lighting.
+    Real recon_nee_light_w; // nee light w at x1 to recalculate nee lighting.
+    Real recon_nee_shape_w; // nee shape w at x1 to recalculate nee lighting.
 
     ReservoirPTSample(): F(make_zero_spectrum()), rnd_param_uv(Vector2{Real(0), Real(0)}), rnd_param_w(Real(0)), recon_out_dir(Vector3{Real(0), Real(0), Real(0)}), recon_next_ver_radiance(make_zero_spectrum()) {};
     ReservoirPTSample(Spectrum F, Vector2 rnd_param_uv, Real rnd_param_w, std::optional<PathVertex> reconnection_vertex, Vector3 recon_out_dir, Spectrum recon_next_ver_radiance):
@@ -86,12 +86,12 @@ struct ReservoirPTSample {
 };
 
 struct ReservoirPT {
-    ReservoirPTSample y;
-    Real Mc;
+    ReservoirPTSample y; // ReservoirPTSample containing candidate light path noted by the next vertex.
+    Real Mc; // M-capping value.
     Real M;// Confidence weight (for e.g., M-capping).
-    Real W;// Unbiased contribution weight.
-    std::optional<PathVertex> org_vertex;
-    Vector2 screen_pos;
+    Real W;// Unbiased contribution weight. W = 1/p_hat * w_sum.
+    std::optional<PathVertex> org_vertex; // hit point of camera on screen_pos
+    Vector2 screen_pos; // screen position where camera hits the ray.
 
     ReservoirPT(): y(ReservoirPTSample()), Mc(36), M(0), W(0), org_vertex({}), screen_pos(Vector2{Real(0), Real(0)}) {};
     ReservoirPT(ReservoirPTSample y, Real Mc, Real M, Real W, std::optional<PathVertex> org_vertex, Vector2 screen_pos, int num_nee, int num_bsdf): 
